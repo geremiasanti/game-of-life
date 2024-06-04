@@ -1,2 +1,2 @@
 # game-of-life
-game of life in vanilla js
+Conway's game of life in vanilla js
