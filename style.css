@@ -1,13 +1,11 @@
-.grid-container {
-  /* grid */
-  display: grid;
-  grid-template-columns: repeat(10, 20px);
-  grid-template-rows: repeat(10, 20px);
-  height: 90vh;
+#grid {
+    /* grid */
+    display: grid;
+    height: 90vh;
 }
 
-.grid-container > div {
-  background-color: white;
-  text-align: center;
-  border: 1px solid black;
+#grid > div {
+    background-color: white;
+    text-align: center;
+    border: 1px solid black;
 }
