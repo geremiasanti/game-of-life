@@ -4,18 +4,20 @@ class Cell {
         this.state = false;
         this.nextState = null;
     }
+
+    
 }
 
 class Grid {
     constructor(htmlElement) {
-        let windowHeight = window.innerHeight;
-        let windowWidth = window.innerWidth;
-        let cellSizePx = 30;
+        this.htmlElement = htmlElement; 
+
+        let windowHeight = this.htmlElement.offsetHeight;
+        let windowWidth = this.htmlElement.offsetWidth;
+        let cellSizePx = 25;
 
         this.rows = Math.floor(windowHeight / cellSizePx);
         this.cols = Math.floor(windowWidth / cellSizePx);
-        this.rows = 10;
-        this.cols = 10;
 
         // init grid
         this.grid = new Array(this.rows).fill().map(
@@ -25,11 +27,10 @@ class Grid {
         );
 
         // grid style (to fit cols and rows)
-        this.htmlElement = htmlElement; 
         this.htmlElement.style.gridTemplateRows = `repeat(${this.rows}, ${cellSizePx}px)`;
         this.htmlElement.style.gridTemplateColumns = `repeat(${this.cols}, ${cellSizePx}px)`;
 
-        this.generation = 1; 
+        this.generation = 0; 
 
         this.drawGrid();
     }
@@ -85,6 +86,7 @@ class Grid {
     } 
 
     drawGeneration() {
+        console.log(`generation: ${this.generation}`)
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
                 if(this.grid[row][col].state) {
@@ -121,20 +123,24 @@ class Grid {
 
 function main() {
     let generationTimespanMs = 750;
-    let grid = new Grid(document.getElementById('grid'));
+    let grid = new Grid(document.getElementById("grid"));
 
     grid.grid[1][1].state = true;
     grid.grid[2][1].state = true;
     grid.grid[3][1].state = true;
-    console.log('generation: 0')
     grid.drawGeneration();
 
-    let mainLoop = setInterval(() => {
-        console.log(`generation: ${grid.generation}`)
-        grid.calculateNextGeneration();  
-        grid.incrementGeneration();  
-        grid.drawGeneration();
-    }, generationTimespanMs);
+    let mainLoop;
+    document.getElementById("start-btn").onclick = () => {
+        mainLoop = setInterval(() => {
+            grid.calculateNextGeneration();  
+            grid.incrementGeneration();  
+            grid.drawGeneration();
+        }, generationTimespanMs);
+    }
+    document.getElementById("stop-btn").onclick = () => {
+        clearInterval(mainLoop);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
