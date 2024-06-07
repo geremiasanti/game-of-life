@@ -137,11 +137,6 @@ function main() {
     let generationTimespanMs = 750;
     let grid = new Grid(document.getElementById("grid"));
 
-    grid.grid[1][1].state = true;
-    grid.grid[2][1].state = true;
-    grid.grid[3][1].state = true;
-    grid.drawGeneration();
-
     let mainLoop;
     document.getElementById("start-btn").onclick = () => {
         mainLoop = setInterval(() => {
