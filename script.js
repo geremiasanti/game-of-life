@@ -3,9 +3,21 @@ class Cell {
         this.htmlElement = document.createElement("div");;
         this.state = false;
         this.nextState = null;
+
+        this.htmlElement.onclick = () => {
+            this.updateStateNow(!this.state);
+        };
     }
 
-    
+    updateStateNow(newState) {
+        this.state = newState;
+
+        if(this.state) {
+            this.htmlElement.style.backgroundColor = "black"; 
+        } else {
+            this.htmlElement.style.backgroundColor = "white"; 
+        }
+    }
 }
 
 class Grid {
@@ -146,4 +158,3 @@ function main() {
 document.addEventListener("DOMContentLoaded", function() {
     main();
 });
-
