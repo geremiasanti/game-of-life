@@ -143,13 +143,22 @@ class Grid {
         } 
         return gridStates;
     }
+
+    setValues(gridValues) {
+        for(let row = 0; row < this.rows; row++) {
+            for(let col = 0; col < this.cols; col++) {
+                //this.grid[row][col] 
+            }
+        }
+    }
 }
 
 function loadSavedGridsList() {
     let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
     let listHTML = "";
     gridsStorage.forEach((savedGrid) => {
-        let loadBtn = `<button>load</button>`;
+        // todo change from attribute to handler
+        let loadBtn = `<button onclick="loadSavedGrid(${savedGrid.index})">load</button>`;
         let deleteBtn = `<button onclick="deleteSavedGrid(${savedGrid.index})">delete</button>`;
         listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
     })
@@ -175,11 +184,19 @@ function saveGrid(grid) {
     loadSavedGridsList();
 }
 
+function loadSavedGrid(savedGridIndex) {
+    let gridsStorage = JSON.parse(localStorage.getItem("grids"));
+    let selectedGrid = gridsStorage.find(
+        (savedGrid) => savedGrid.index == savedGridIndex
+    );
+    console.log('loading', selectedGrid);
+}
+
 function deleteSavedGrid(savedGridIndex) {
     let gridsStorage = JSON.parse(localStorage.getItem("grids"));
-    let gridsStorageFiltered = gridsStorage.filter((savedGrid) => {
-        return savedGrid.index != savedGridIndex; 
-    })
+    let gridsStorageFiltered = gridsStorage.filter(
+        (savedGrid) => savedGrid.index != savedGridIndex
+    );
     localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
     loadSavedGridsList();
 }
@@ -199,11 +216,11 @@ function main() {
     document.getElementById("stop-btn").onclick = () => {
         clearInterval(mainLoop);
     }
-
-    loadSavedGridsList();
     document.getElementById("save-btn").onclick = () => {
         saveGrid(grid.getValues());
     }
+
+    loadSavedGridsList();
 }
 
 document.addEventListener("DOMContentLoaded", function() {
