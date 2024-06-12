@@ -147,11 +147,57 @@ class Grid {
     setValues(gridValues) {
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
-                //this.grid[row][col] 
+                this.grid[row][col].updateStateNow(
+                    gridValues[row][col] || false
+                );
             }
         }
     }
 }
+
+function loadSavedGridsList(grid) {
+    function loadSavedGrid(grid, savedGridIndex) {
+        let gridsStorage = JSON.parse(localStorage.getItem("grids"));
+        let selectedGrid = gridsStorage.find(
+            (savedGrid) => savedGrid.index == savedGridIndex
+        );
+        grid.setValues(selectedGrid.grid);
+    }
+
+    function deleteSavedGrid(savedGridIndex) {
+        let gridsStorage = JSON.parse(localStorage.getItem("grids"));
+        let gridsStorageFiltered = gridsStorage.filter(
+            (savedGrid) => savedGrid.index != savedGridIndex
+        );
+        localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
+        loadSavedGridsList();
+    }
+
+    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
+    let listHTML = "";
+    gridsStorage.forEach((savedGrid) => {
+        // todo change from attribute to handler
+        let loadBtn = `<button class="load-saved-grid-btn" data-grid-index="${savedGrid.index}">load</button>`;
+        let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
+        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
+    })
+    let savedGridsList = document.getElementById("saved-grids-list");
+    savedGridsList.innerHTML = listHTML
+
+    document.querySelectorAll('.load-saved-grid-btn').forEach(
+        (loadBtn) => loadBtn.onclick = () => {
+            let index = loadBtn.dataset.gridIndex;
+            loadSavedGrid(grid, index);
+        }
+    );
+    document.querySelectorAll('.delete-saved-grid-btn').forEach(
+        (deleteBtn) => deleteBtn.onclick = () => {
+            let index = deleteBtn.dataset.gridIndex;
+            deleteSavedGrid(index);
+        }
+    );
+};
+
 
 function saveGrid(grid) {
     function getNextIndex(gridsStorage) {
@@ -170,49 +216,6 @@ function saveGrid(grid) {
     localStorage.setItem("grids", JSON.stringify(gridsStorage));
     loadSavedGridsList();
 }
-
-function loadSavedGrid(savedGridIndex) {
-    let gridsStorage = JSON.parse(localStorage.getItem("grids"));
-    let selectedGrid = gridsStorage.find(
-        (savedGrid) => savedGrid.index == savedGridIndex
-    );
-    console.log('loading', selectedGrid);
-}
-
-function deleteSavedGrid(savedGridIndex) {
-    let gridsStorage = JSON.parse(localStorage.getItem("grids"));
-    let gridsStorageFiltered = gridsStorage.filter(
-        (savedGrid) => savedGrid.index != savedGridIndex
-    );
-    localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
-    loadSavedGridsList();
-}
-
-function loadSavedGridsList() {
-    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
-    let listHTML = "";
-    gridsStorage.forEach((savedGrid) => {
-        // todo change from attribute to handler
-        let loadBtn = `<button class="load-saved-grid-btn" data-grid-index="${savedGrid.index}">load</button>`;
-        let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
-        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
-    })
-    let savedGridsList = document.getElementById("saved-grids-list");
-    savedGridsList.innerHTML = listHTML
-
-    document.querySelectorAll('.load-saved-grid-btn').forEach(
-        (loadBtn) => loadBtn.onclick = () => {
-            let index = loadBtn.dataset.gridIndex;
-            loadSavedGrid(index);
-        }
-    );
-    document.querySelectorAll('.delete-saved-grid-btn').forEach(
-        (deleteBtn) => deleteBtn.onclick = () => {
-            let index = deleteBtn.dataset.gridIndex;
-            deleteSavedGrid(index);
-        }
-    );
-};
 
 function main() {
     let generationTimespanMs = 750;
@@ -233,7 +236,7 @@ function main() {
         saveGrid(grid.getValues());
     }
 
-    loadSavedGridsList();
+    loadSavedGridsList(grid);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
