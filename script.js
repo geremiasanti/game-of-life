@@ -193,13 +193,19 @@ function loadSavedGridsList() {
     let listHTML = "";
     gridsStorage.forEach((savedGrid) => {
         // todo change from attribute to handler
-        let loadBtn = `<button onclick="loadSavedGrid(${savedGrid.index})">load</button>`;
+        let loadBtn = `<button class="load-saved-grid-btn" data-grid-index="${savedGrid.index}">load</button>`;
         let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
         listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
     })
     let savedGridsList = document.getElementById("saved-grids-list");
     savedGridsList.innerHTML = listHTML
 
+    document.querySelectorAll('.load-saved-grid-btn').forEach(
+        (loadBtn) => loadBtn.onclick = () => {
+            let index = loadBtn.dataset.gridIndex;
+            loadSavedGrid(index);
+        }
+    );
     document.querySelectorAll('.delete-saved-grid-btn').forEach(
         (deleteBtn) => deleteBtn.onclick = () => {
             let index = deleteBtn.dataset.gridIndex;
