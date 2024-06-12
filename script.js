@@ -131,6 +131,57 @@ class Grid {
         }
         return liveNeighbors;
     }
+
+    getValues() {
+        let gridStates = new Array();
+        for(let row = 0; row < this.rows; row++) {
+            let rowStates = new Array();
+            for(let col = 0; col < this.cols; col++) {
+                rowStates.push(this.grid[row][col].state);  
+            } 
+            gridStates.push(rowStates);
+        } 
+        return gridStates;
+    }
+}
+
+function loadSavedGridsList() {
+    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
+    let listHTML = "";
+    gridsStorage.forEach((savedGrid) => {
+        let loadBtn = `<button>load</button>`;
+        let deleteBtn = `<button onclick="deleteSavedGrid(${savedGrid.index})">delete</button>`;
+        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
+    })
+    let savedGridsList = document.getElementById("saved-grids-list");
+    savedGridsList.innerHTML = listHTML
+};
+
+function saveGrid(grid) {
+    function getNextIndex(gridsStorage) {
+        let maxIndex = gridsStorage.reduce((maxIndex, savedGrid) => 
+            Math.max(maxIndex, savedGrid.index),
+            -1
+        );
+        return maxIndex + 1;
+    }
+
+    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
+    gridsStorage.push({
+        index: getNextIndex(gridsStorage),
+        grid: grid
+    });
+    localStorage.setItem("grids", JSON.stringify(gridsStorage));
+    loadSavedGridsList();
+}
+
+function deleteSavedGrid(savedGridIndex) {
+    let gridsStorage = JSON.parse(localStorage.getItem("grids"));
+    let gridsStorageFiltered = gridsStorage.filter((savedGrid) => {
+        return savedGrid.index != savedGridIndex; 
+    })
+    localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
+    loadSavedGridsList();
 }
 
 function main() {
@@ -147,6 +198,11 @@ function main() {
     }
     document.getElementById("stop-btn").onclick = () => {
         clearInterval(mainLoop);
+    }
+
+    loadSavedGridsList();
+    document.getElementById("save-btn").onclick = () => {
+        saveGrid(grid.getValues());
     }
 }
 
