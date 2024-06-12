@@ -153,23 +153,10 @@ class Grid {
     }
 }
 
-function loadSavedGridsList() {
-    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
-    let listHTML = "";
-    gridsStorage.forEach((savedGrid) => {
-        // todo change from attribute to handler
-        let loadBtn = `<button onclick="loadSavedGrid(${savedGrid.index})">load</button>`;
-        let deleteBtn = `<button onclick="deleteSavedGrid(${savedGrid.index})">delete</button>`;
-        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
-    })
-    let savedGridsList = document.getElementById("saved-grids-list");
-    savedGridsList.innerHTML = listHTML
-};
-
 function saveGrid(grid) {
     function getNextIndex(gridsStorage) {
-        let maxIndex = gridsStorage.reduce((maxIndex, savedGrid) => 
-            Math.max(maxIndex, savedGrid.index),
+        let maxIndex = gridsStorage.reduce(
+            (maxIndex, savedGrid) => Math.max(maxIndex, savedGrid.index),
             -1
         );
         return maxIndex + 1;
@@ -200,6 +187,26 @@ function deleteSavedGrid(savedGridIndex) {
     localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
     loadSavedGridsList();
 }
+
+function loadSavedGridsList() {
+    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
+    let listHTML = "";
+    gridsStorage.forEach((savedGrid) => {
+        // todo change from attribute to handler
+        let loadBtn = `<button onclick="loadSavedGrid(${savedGrid.index})">load</button>`;
+        let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
+        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
+    })
+    let savedGridsList = document.getElementById("saved-grids-list");
+    savedGridsList.innerHTML = listHTML
+
+    document.querySelectorAll('.delete-saved-grid-btn').forEach(
+        (deleteBtn) => deleteBtn.onclick = () => {
+            let index = deleteBtn.dataset.gridIndex;
+            deleteSavedGrid(index);
+        }
+    );
+};
 
 function main() {
     let generationTimespanMs = 750;
