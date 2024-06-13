@@ -25,7 +25,7 @@ class Cell {
 
     updateCell(newState) {
         if(newState == this.state) 
-            return
+            return;
 
         this.state = newState;
 
@@ -157,7 +157,7 @@ class Grid {
         for(let row = cellRow - 1; row <= cellRow + 1; row++) {
             for(let col = cellCol - 1; col <= cellCol + 1; col++) {
                 if(row == cellRow && col == cellCol) 
-                    continue
+                    continue;
 
                 // "connect" opposite sides of the grid
                 let cleanRow = row;
