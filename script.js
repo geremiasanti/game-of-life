@@ -4,18 +4,48 @@ class Cell {
         this.state = false;
         this.nextState = null;
 
+        this.neighbors = new Array();
+        this.liveNeighbors = 0;
+        this.liveNeighborsChanged = false;
+
         this.htmlElement.onclick = () => {
-            this.updateStateNow(!this.state);
+            this.updateCell(!this.state);
         };
     }
 
-    updateStateNow(newState) {
+    incrementLiveNeighbors(increment) {
+        this.liveNeighbors += increment;
+        this.liveNeighborsChanged = true;
+    }
+
+    nextGeneration() {
+        this.updateCell(this.nextState)
+        this.nextState = null;
+    }
+
+    updateCell(newState) {
+        if(newState == this.state) 
+            return
+
         this.state = newState;
 
+        let neighborsIncrement = newState ? 1 : -1;
+        this.neighbors.forEach((neighbor) => {
+            neighbor.incrementLiveNeighbors(neighborsIncrement);
+            neighbor.updateCellStyle();
+        });
+
+        this.updateCellStyle();
+    }
+
+    updateCellStyle() {
+        this.htmlElement.innerText = this.liveNeighbors;
         if(this.state) {
             this.htmlElement.style.backgroundColor = "black"; 
+            this.htmlElement.style.color = "white"; 
         } else {
             this.htmlElement.style.backgroundColor = "white"; 
+            this.htmlElement.style.color = "black"; 
         }
     }
 }
@@ -37,6 +67,32 @@ class Grid {
                 (_) => new Cell()
             )
         );
+
+        // reference neighbors
+        for(let cellRow = 0; cellRow < this.rows; cellRow ++) {
+            for(let cellCol = 0; cellCol < this.cols; cellCol++) {
+                this.grid[cellRow][cellCol].neighbors = new Array();
+
+                for(let row = cellRow - 1; row <= cellRow + 1; row++) {
+                    for(let col = cellCol - 1; col <= cellCol + 1; col++) {
+                        if(row == cellRow && col == cellCol) 
+                            continue
+
+                        // "connect" opposite sides of the grid
+                        let cleanRow = row;
+                        let cleanCol = col;
+                        if(row < 0) cleanRow = this.rows + row;
+                        if(row > this.rows - 1) cleanRow = row % this.rows
+                        if(col < 0) cleanCol = this.cols + col;
+                        if(col > this.cols - 1) cleanCol = col % this.cols
+
+                        this.grid[cellRow][cellCol].neighbors.push(
+                            this.grid[cleanRow][cleanCol]
+                        );
+                    }
+                }
+            } 
+        }
 
         // grid style (to fit cols and rows)
         this.htmlElement.style.gridTemplateRows = `repeat(${this.rows}, ${cellSizePx}px)`;
@@ -89,26 +145,12 @@ class Grid {
     incrementGeneration() {
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
-                this.grid[row][col].state = this.grid[row][col].nextState;
-                this.grid[row][col].nextState = null;
+                this.grid[row][col].nextGeneration();
             } 
         } 
 
         this.generation++
     } 
-
-    drawGeneration() {
-        console.log(`generation: ${this.generation}`)
-        for(let row = 0; row < this.rows; row++) {
-            for(let col = 0; col < this.cols; col++) {
-                if(this.grid[row][col].state) {
-                    this.grid[row][col].htmlElement.style.backgroundColor = "black"; 
-                } else {
-                    this.grid[row][col].htmlElement.style.backgroundColor = "white"; 
-                }
-            }
-        }
-    }
 
     getLiveNeighbors(cellRow, cellCol) {
         let liveNeighbors = 0;
@@ -147,7 +189,7 @@ class Grid {
     setValues(gridValues) {
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
-                this.grid[row][col].updateStateNow(
+                this.grid[row][col].updateCell(
                     gridValues[row][col] || false
                 );
             }
@@ -176,7 +218,6 @@ function loadSavedGridsList(grid) {
     let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
     let listHTML = "";
     gridsStorage.forEach((savedGrid) => {
-        // todo change from attribute to handler
         let loadBtn = `<button class="load-saved-grid-btn" data-grid-index="${savedGrid.index}">load</button>`;
         let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
         listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
@@ -226,7 +267,6 @@ function main() {
         mainLoop = setInterval(() => {
             grid.calculateNextGeneration();  
             grid.incrementGeneration();  
-            grid.drawGeneration();
         }, generationTimespanMs);
     }
     document.getElementById("stop-btn").onclick = () => {
