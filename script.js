@@ -6,21 +6,13 @@ class Cell {
 
         this.neighbors = new Array();
         this.liveNeighbors = 0;
-        this.liveNeighborsChanged = false;
+
+        // wasn't working
+        //this.liveNeighborsChanged = false;
 
         this.htmlElement.onclick = () => {
             this.updateCell(!this.state);
         };
-    }
-
-    incrementLiveNeighbors(increment) {
-        this.liveNeighbors += increment;
-        this.liveNeighborsChanged = true;
-    }
-
-    nextGeneration() {
-        this.updateCell(this.nextState)
-        this.nextState = null;
     }
 
     updateCell(newState) {
@@ -44,6 +36,15 @@ class Cell {
             this.htmlElement.style.backgroundColor = "white"; 
             this.htmlElement.style.color = "black"; 
         }
+    }
+
+    incrementLiveNeighbors(increment) {
+        this.liveNeighbors += increment;
+    }
+
+    nextGeneration() {
+        this.updateCell(this.nextState)
+        this.nextState = null;
     }
 }
 
@@ -115,18 +116,20 @@ class Grid {
             for(let col = 0; col < this.cols; col++) {
                 let currentCell = this.grid[row][col];
 
-                // underpopulation
                 if(currentCell.state && currentCell.liveNeighbors < 2) {
+                    // underpopulation
                     currentCell.nextState = false;
                     continue;
                 }
-                // overpopulation
+
                 if(currentCell.state && currentCell.liveNeighbors > 3) {
+                    // overpopulation
                     currentCell.nextState = false;
                     continue;
                 }
-                // birth
+
                 if(!currentCell.state && currentCell.liveNeighbors == 3) {
+                    // birth
                     currentCell.nextState = true;
                     continue;
                 }
@@ -147,28 +150,6 @@ class Grid {
 
         this.generation++
     } 
-
-    getLiveNeighbors(cellRow, cellCol) {
-        let liveNeighbors = 0;
-        for(let row = cellRow - 1; row <= cellRow + 1; row++) {
-            for(let col = cellCol - 1; col <= cellCol + 1; col++) {
-                if(row == cellRow && col == cellCol) 
-                    continue;
-
-                // "connect" opposite sides of the grid
-                let cleanRow = row;
-                let cleanCol = col;
-                if(row < 0) cleanRow = this.rows + row;
-                if(row > this.rows - 1) cleanRow = row % this.rows
-                if(col < 0) cleanCol = this.cols + col;
-                if(col > this.cols - 1) cleanCol = col % this.cols
-
-                if(this.grid[cleanRow][cleanCol].state)
-                    liveNeighbors++;
-            }
-        }
-        return liveNeighbors;
-    }
 
     getValues() {
         let gridStates = new Array();
