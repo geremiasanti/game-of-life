@@ -28,18 +28,15 @@ class Cell {
             return;
 
         this.state = newState;
+        this.updateCellStyle();
 
         let neighborsIncrement = newState ? 1 : -1;
         this.neighbors.forEach((neighbor) => {
             neighbor.incrementLiveNeighbors(neighborsIncrement);
-            neighbor.updateCellStyle();
         });
-
-        this.updateCellStyle();
     }
 
     updateCellStyle() {
-        this.htmlElement.innerText = this.liveNeighbors;
         if(this.state) {
             this.htmlElement.style.backgroundColor = "black"; 
             this.htmlElement.style.color = "white"; 
@@ -116,21 +113,20 @@ class Grid {
     calculateNextGeneration() {
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
-                let currentCell = this.grid[row][col]
-                let liveNeighbors = this.getLiveNeighbors(row, col)
+                let currentCell = this.grid[row][col];
 
                 // underpopulation
-                if(currentCell.state && liveNeighbors < 2) {
+                if(currentCell.state && currentCell.liveNeighbors < 2) {
                     currentCell.nextState = false;
                     continue;
                 }
                 // overpopulation
-                if(currentCell.state && liveNeighbors > 3) {
+                if(currentCell.state && currentCell.liveNeighbors > 3) {
                     currentCell.nextState = false;
                     continue;
                 }
                 // birth
-                if(!currentCell.state && liveNeighbors == 3) {
+                if(!currentCell.state && currentCell.liveNeighbors == 3) {
                     currentCell.nextState = true;
                     continue;
                 }
