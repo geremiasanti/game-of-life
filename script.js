@@ -193,13 +193,13 @@ function loadSavedGridsList(grid) {
         grid.setValues(selectedGrid.grid);
     }
 
-    function deleteSavedGrid(savedGridIndex) {
+    function deleteSavedGrid(grid, savedGridIndex) {
         let gridsStorage = JSON.parse(localStorage.getItem("grids"));
         let gridsStorageFiltered = gridsStorage.filter(
             (savedGrid) => savedGrid.index != savedGridIndex
         );
         localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
-        loadSavedGridsList();
+        loadSavedGridsList(grid);
     }
 
     let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
@@ -221,13 +221,13 @@ function loadSavedGridsList(grid) {
     document.querySelectorAll('.delete-saved-grid-btn').forEach(
         (deleteBtn) => deleteBtn.onclick = () => {
             let index = deleteBtn.dataset.gridIndex;
-            deleteSavedGrid(index);
+            deleteSavedGrid(grid, index);
         }
     );
 };
 
 
-function saveGrid(grid) {
+function saveGrid(grid, gridValues) {
     function getNextIndex(gridsStorage) {
         let maxIndex = gridsStorage.reduce(
             (maxIndex, savedGrid) => Math.max(maxIndex, savedGrid.index),
@@ -239,10 +239,10 @@ function saveGrid(grid) {
     let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
     gridsStorage.push({
         index: getNextIndex(gridsStorage),
-        grid: grid
+        grid: gridValues
     });
     localStorage.setItem("grids", JSON.stringify(gridsStorage));
-    loadSavedGridsList();
+    loadSavedGridsList(grid);
 }
 
 function main() {
@@ -268,7 +268,7 @@ function main() {
         startBtn.classList.remove('display-none');
     }
     document.getElementById("save-btn").onclick = () => {
-        saveGrid(grid.getValues());
+        saveGrid(grid, grid.getValues());
     }
     document.getElementById("restart-btn").onclick = () => {
         if(grid.lastConfiguration == null)
