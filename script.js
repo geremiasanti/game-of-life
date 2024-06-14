@@ -7,6 +7,8 @@ class Cell {
         this.neighbors = new Array();
         this.liveNeighbors = 0;
 
+        this.lastConfiguration = null;
+
         // wasn't working
         //this.liveNeighborsChanged = false;
 
@@ -172,6 +174,14 @@ class Grid {
             }
         }
     }
+
+    clear() {
+        for(let row = 0; row < this.rows; row++) {
+            for(let col = 0; col < this.cols; col++) {
+                this.grid[row][col].updateCell(false);
+            }
+        }
+    }
 }
 
 function loadSavedGridsList(grid) {
@@ -236,21 +246,37 @@ function saveGrid(grid) {
 }
 
 function main() {
-    let generationTimespanMs = 750;
+    let generationTimespanMs = 250;
     let grid = new Grid(document.getElementById("grid"));
 
     let mainLoop;
-    document.getElementById("start-btn").onclick = () => {
+    let startBtn = document.getElementById("start-btn");
+    let stopBtn = document.getElementById("stop-btn");
+    startBtn.onclick = () => {
+        grid.lastConfiguration = JSON.stringify(grid.getValues()); 
+
         mainLoop = setInterval(() => {
             grid.calculateNextGeneration();  
             grid.incrementGeneration();  
         }, generationTimespanMs);
+        startBtn.classList.add('display-none')
+        stopBtn.classList.remove('display-none');
     }
-    document.getElementById("stop-btn").onclick = () => {
+    stopBtn.onclick = () => {
         clearInterval(mainLoop);
+        stopBtn.classList.add('display-none')
+        startBtn.classList.remove('display-none');
     }
     document.getElementById("save-btn").onclick = () => {
         saveGrid(grid.getValues());
+    }
+    document.getElementById("restart-btn").onclick = () => {
+        if(grid.lastConfiguration == null)
+            return;
+        grid.setValues(JSON.parse(grid.lastConfiguration));
+    }
+    document.getElementById("clear-btn").onclick = () => {
+        grid.clear();
     }
 
     loadSavedGridsList(grid);
