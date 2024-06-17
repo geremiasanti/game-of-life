@@ -9,9 +9,6 @@ class Cell {
 
         this.lastConfiguration = null;
 
-        // wasn't working
-        //this.liveNeighborsChanged = false;
-
         this.htmlElement.onclick = () => {
             this.updateCell(!this.state);
         };
@@ -33,10 +30,8 @@ class Cell {
     updateCellStyle() {
         if(this.state) {
             this.htmlElement.style.backgroundColor = "black"; 
-            this.htmlElement.style.color = "white"; 
         } else {
             this.htmlElement.style.backgroundColor = "white"; 
-            this.htmlElement.style.color = "black"; 
         }
     }
 
@@ -182,6 +177,17 @@ class Grid {
             }
         }
     }
+
+    randomize() {
+        for(let row = 0; row < this.rows; row++) {
+            for(let col = 0; col < this.cols; col++) {
+                // fill with random bool
+                this.grid[row][col].updateCell(
+                    Math.random() >= 0.5
+                );
+            }
+        }
+    }
 }
 
 function loadSavedGridsList(grid) {
@@ -274,6 +280,9 @@ function main() {
         if(grid.lastConfiguration == null)
             return;
         grid.setValues(JSON.parse(grid.lastConfiguration));
+    }
+    document.getElementById("random-btn").onclick = () => {
+        grid.randomize();
     }
     document.getElementById("clear-btn").onclick = () => {
         grid.clear();
