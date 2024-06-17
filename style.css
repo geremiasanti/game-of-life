@@ -1,12 +1,26 @@
+#grid-wrapper {
+    position: relative;
+    height: 90vh;
+}
+
 #grid {
     display: grid;
-    height: 90vh;
+    height: 100%;
+    width: 100%;
 }
 
 #grid > div {
     background-color: white;
     text-align: center;
     border: 1px solid black;
+}
+
+#visual-selection-canvas {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
 }
 
 .display-none {

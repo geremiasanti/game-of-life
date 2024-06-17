@@ -251,10 +251,34 @@ function saveGrid(grid, gridValues) {
     loadSavedGridsList(grid);
 }
 
-function main() {
-    let generationTimespanMs = 250;
-    let grid = new Grid(document.getElementById("grid"));
+class VisualSelection {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.selecting = false;
 
+        this.canvas.onmousedown = (event) => {
+            this.selecting = true;
+            console.log(event);
+        };
+        this.canvas.onmousemove = (event) => {
+            if(this.selecting) {
+                console.log(event);
+            }
+        };
+        this.canvas.onmouseup = (event) => {
+            this.selecting = false;
+            console.log(event);
+        };
+    }
+}
+
+function main() {
+    let grid = new Grid(document.getElementById("grid"));
+    let visualSelection = new VisualSelection(
+        document.getElementById("visual-selection-canvas")
+    );
+
+    let generationTimespanMs = 250;
     let mainLoop;
     let startBtn = document.getElementById("start-btn");
     let stopBtn = document.getElementById("stop-btn");
