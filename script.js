@@ -218,13 +218,13 @@ function loadSavedGridsList(grid) {
     let savedGridsList = document.getElementById("saved-grids-list");
     savedGridsList.innerHTML = listHTML
 
-    document.querySelectorAll('.load-saved-grid-btn').forEach(
+    document.querySelectorAll(".load-saved-grid-btn").forEach(
         (loadBtn) => loadBtn.onclick = () => {
             let index = loadBtn.dataset.gridIndex;
             loadSavedGrid(grid, index);
         }
     );
-    document.querySelectorAll('.delete-saved-grid-btn').forEach(
+    document.querySelectorAll(".delete-saved-grid-btn").forEach(
         (deleteBtn) => deleteBtn.onclick = () => {
             let index = deleteBtn.dataset.gridIndex;
             deleteSavedGrid(grid, index);
@@ -254,21 +254,66 @@ function saveGrid(grid, gridValues) {
 class VisualSelection {
     constructor(canvas) {
         this.canvas = canvas;
+        this.setupCanvas();
+
+        this.context2d = this.canvas.getContext("2d");
         this.selecting = false;
 
+
+        this.start = {
+            x: null,
+            y: null
+        }
+        this.end = {
+            x: null,
+            y: null
+        }
+
         this.canvas.onmousedown = (event) => {
+            this.clear();
+
             this.selecting = true;
-            console.log(event);
+            this.start.x = event.layerX;
+            this.start.y = event.layerY;
         };
         this.canvas.onmousemove = (event) => {
+            this.clear();
+
             if(this.selecting) {
-                console.log(event);
+                this.end.x = event.layerX;
+                this.end.y = event.layerY;
+                this.drawRect()
             }
         };
         this.canvas.onmouseup = (event) => {
+            this.clear();
+
             this.selecting = false;
-            console.log(event);
         };
+    }
+
+    setupCanvas() {
+        this.canvas.setAttribute(
+            'width', 
+            window.getComputedStyle(this.canvas, null).getPropertyValue("width")
+        );
+        this.canvas.setAttribute(
+            'height', 
+            window.getComputedStyle(this.canvas, null).getPropertyValue("height")
+        );
+    }
+
+    clear() {
+        this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    drawRect() {
+        this.context2d.beginPath();
+
+        this.context2d.moveTo(this.start.x, this.start.y);
+        this.context2d.lineTo(this.end.x, this.end.y);
+
+        this.context2d.stroke();
     }
 }
 
@@ -289,13 +334,13 @@ function main() {
             grid.calculateNextGeneration();  
             grid.incrementGeneration();  
         }, generationTimespanMs);
-        startBtn.classList.add('display-none')
-        stopBtn.classList.remove('display-none');
+        startBtn.classList.add("display-none")
+        stopBtn.classList.remove("display-none");
     }
     stopBtn.onclick = () => {
         clearInterval(mainLoop);
-        stopBtn.classList.add('display-none')
-        startBtn.classList.remove('display-none');
+        stopBtn.classList.add("display-none")
+        startBtn.classList.remove("display-none");
     }
     document.getElementById("save-btn").onclick = () => {
         saveGrid(grid, grid.getValues());
