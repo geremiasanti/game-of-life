@@ -188,75 +188,22 @@ class Grid {
             }
         }
     }
+
+    getCellElements() {
+        return this.grid.flat().map((cell) => cell.htmlElement);
+    }
 }
 
-function loadSavedGridsList(grid) {
-    function loadSavedGrid(grid, savedGridIndex) {
-        let gridsStorage = JSON.parse(localStorage.getItem("grids"));
-        let selectedGrid = gridsStorage.find(
-            (savedGrid) => savedGrid.index == savedGridIndex
-        );
-        grid.setValues(selectedGrid.grid);
-    }
-
-    function deleteSavedGrid(grid, savedGridIndex) {
-        let gridsStorage = JSON.parse(localStorage.getItem("grids"));
-        let gridsStorageFiltered = gridsStorage.filter(
-            (savedGrid) => savedGrid.index != savedGridIndex
-        );
-        localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
-        loadSavedGridsList(grid);
-    }
-
-    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
-    let listHTML = "";
-    gridsStorage.forEach((savedGrid) => {
-        let loadBtn = `<button class="load-saved-grid-btn" data-grid-index="${savedGrid.index}">load</button>`;
-        let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
-        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
-    })
-    let savedGridsList = document.getElementById("saved-grids-list");
-    savedGridsList.innerHTML = listHTML
-
-    document.querySelectorAll(".load-saved-grid-btn").forEach(
-        (loadBtn) => loadBtn.onclick = () => {
-            let index = loadBtn.dataset.gridIndex;
-            loadSavedGrid(grid, index);
-        }
-    );
-    document.querySelectorAll(".delete-saved-grid-btn").forEach(
-        (deleteBtn) => deleteBtn.onclick = () => {
-            let index = deleteBtn.dataset.gridIndex;
-            deleteSavedGrid(grid, index);
-        }
-    );
-};
-
-
-function saveGrid(grid, gridValues) {
-    function getNextIndex(gridsStorage) {
-        let maxIndex = gridsStorage.reduce(
-            (maxIndex, savedGrid) => Math.max(maxIndex, savedGrid.index),
-            -1
-        );
-        return maxIndex + 1;
-    }
-
-    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
-    gridsStorage.push({
-        index: getNextIndex(gridsStorage),
-        grid: gridValues
-    });
-    localStorage.setItem("grids", JSON.stringify(gridsStorage));
-    loadSavedGridsList(grid);
-}
 
 class VisualSelection {
-    constructor(canvas) {
+    constructor(canvas, selectables) {
         this.canvas = canvas;
         this.setupCanvas();
-
         this.context2d = this.canvas.getContext("2d");
+
+        this.selectables = selectables;
+        this.selected = new Array();
+
         this.selecting = false;
 
         this.start = {
@@ -288,6 +235,9 @@ class VisualSelection {
         [this.canvas, window].forEach(element => {
             element.onmouseup = (event) => {
                 if(this.selecting) {
+                    this.selected = this.getElementsInsideSelection();
+                    console.log(this.selected);
+
                     this.clear();
                     this.selecting = false;
                 }
@@ -334,12 +284,79 @@ class VisualSelection {
         )
         this.context2d.fill();
     }
+
+    getElementsInsideSelection() {
+        this.selectables.filter;
+    }
 }
+
+function saveGrid(grid, gridValues) {
+    function getNextIndex(gridsStorage) {
+        let maxIndex = gridsStorage.reduce(
+            (maxIndex, savedGrid) => Math.max(maxIndex, savedGrid.index),
+            -1
+        );
+        return maxIndex + 1;
+    }
+
+    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
+    gridsStorage.push({
+        index: getNextIndex(gridsStorage),
+        grid: gridValues
+    });
+    localStorage.setItem("grids", JSON.stringify(gridsStorage));
+    loadSavedGridsList(grid);
+}
+
+function loadSavedGridsList(grid) {
+    function loadSavedGrid(grid, savedGridIndex) {
+        let gridsStorage = JSON.parse(localStorage.getItem("grids"));
+        let selectedGrid = gridsStorage.find(
+            (savedGrid) => savedGrid.index == savedGridIndex
+        );
+        grid.setValues(selectedGrid.grid);
+    }
+
+    function deleteSavedGrid(grid, savedGridIndex) {
+        let gridsStorage = JSON.parse(localStorage.getItem("grids"));
+        let gridsStorageFiltered = gridsStorage.filter(
+            (savedGrid) => savedGrid.index != savedGridIndex
+        );
+        localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
+        loadSavedGridsList(grid);
+    }
+
+    let gridsStorage = JSON.parse(localStorage.getItem("grids")) || new Array();
+    let listHTML = "";
+    gridsStorage.forEach((savedGrid) => {
+        let loadBtn = `<button class="load-saved-grid-btn" data-grid-index="${savedGrid.index}">load</button>`;
+        let deleteBtn = `<button class="delete-saved-grid-btn" data-grid-index="${savedGrid.index}">delete</button>`;
+        listHTML = `<li>grid ${savedGrid.index} ${loadBtn} ${deleteBtn}</li>`.concat(listHTML); 
+    })
+    let savedGridsList = document.getElementById("saved-grids-list");
+    savedGridsList.innerHTML = listHTML
+
+    document.querySelectorAll(".load-saved-grid-btn").forEach(
+        (loadBtn) => loadBtn.onclick = () => {
+            let index = loadBtn.dataset.gridIndex;
+            loadSavedGrid(grid, index);
+        }
+    );
+    document.querySelectorAll(".delete-saved-grid-btn").forEach(
+        (deleteBtn) => deleteBtn.onclick = () => {
+            let index = deleteBtn.dataset.gridIndex;
+            deleteSavedGrid(grid, index);
+        }
+    );
+};
+
+
 
 function main() {
     let grid = new Grid(document.getElementById("grid"));
     let visualSelection = new VisualSelection(
-        document.getElementById("visual-selection-canvas")
+        document.getElementById("visual-selection-canvas"),
+        grid.getCellElements()
     );
 
     let generationTimespanMs = 250;
