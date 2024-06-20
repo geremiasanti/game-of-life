@@ -259,7 +259,6 @@ class VisualSelection {
         this.context2d = this.canvas.getContext("2d");
         this.selecting = false;
 
-
         this.start = {
             x: null,
             y: null
@@ -285,11 +284,15 @@ class VisualSelection {
                 this.drawRect()
             }
         };
-        this.canvas.onmouseup = (event) => {
-            this.clear();
 
-            this.selecting = false;
-        };
+        [this.canvas, window].forEach(element => {
+            element.onmouseup = (event) => {
+                if(this.selecting) {
+                    this.clear();
+                    this.selecting = false;
+                }
+            };
+        });
     }
 
     setupCanvas() {
