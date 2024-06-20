@@ -310,12 +310,26 @@ class VisualSelection {
     }
 
     drawRect() {
-        this.context2d.beginPath();
-
-        this.context2d.moveTo(this.start.x, this.start.y);
+        // perimeter
+        this.context2d.globalAlpha = 1;
+        this.context2d.beginPath(); 
+        this.context2d.moveTo(this.start.x , this.start.y);
+        this.context2d.lineTo(this.end.x , this.start.y);
         this.context2d.lineTo(this.end.x, this.end.y);
-
+        this.context2d.lineTo(this.start.x, this.end.y);
+        this.context2d.lineTo(this.start.x, this.start.y);
         this.context2d.stroke();
+
+        // fill
+        this.context2d.globalAlpha = 0.2;
+        this.context2d.beginPath(); 
+        this.context2d.rect(
+            this.start.x,
+            this.start.y, 
+            this.end.x - this.start.x,
+            this.end.y - this.start.y,
+        )
+        this.context2d.fill();
     }
 }
 
