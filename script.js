@@ -293,6 +293,8 @@ class VisualSelection {
     }
 
     setupCanvas() {
+        // css properties just stretch the canvas,
+        // need to set attributes for coorrect pixels coordinates
         this.canvas.setAttribute(
             'width', 
             window.getComputedStyle(this.canvas, null).getPropertyValue("width")
