@@ -237,9 +237,13 @@ class VisualSelection {
         this.canvas.onmousedown = (event) => {
             this.clear();
 
+            console.log(event);
+
             this.selecting = true;
             this.selection.canvasCoords.left = event.layerX;
             this.selection.canvasCoords.top = event.layerY;
+            this.selection.windowCoords.left = event.clientX;
+            this.selection.windowCoords.top = event.clientY;
         };
         this.canvas.onmousemove = (event) => {
             this.clear();
@@ -247,6 +251,8 @@ class VisualSelection {
             if(this.selecting) {
                 this.selection.canvasCoords.right = event.layerX;
                 this.selection.canvasCoords.bottom = event.layerY;
+                this.selection.windowCoords.right = event.clientX;
+                this.selection.windowCoords.bottom = event.clientY;
                 this.drawRect()
             }
         };
@@ -255,6 +261,7 @@ class VisualSelection {
             element.onmouseup = (event) => {
                 if(this.selecting) {
                     this.selected = this.getElementsInsideSelection();
+                    console.log(this.selected);
 
                     this.clear();
                     this.selecting = false;
@@ -319,6 +326,7 @@ class VisualSelection {
     }
 
     getElementsInsideSelection() {
+        console.log(this.selection);
         return this.selectables;
     }
 }
