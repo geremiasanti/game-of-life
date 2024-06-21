@@ -195,39 +195,58 @@ class Grid {
 }
 
 
+class Selectable {
+    constructor(htmlElement) {
+        this.htmlElement = htmlElement;
+        let boundingClientRect = htmlElement.getBoundingClientRect();
+        this.left = parseInt(boundingClientRect.left);
+        this.top = parseInt(boundingClientRect.top);
+        this.right = parseInt(boundingClientRect.right);
+        this.bottom = parseInt(boundingClientRect.bottom);
+    }
+}
+
+
 class VisualSelection {
-    constructor(canvas, selectables) {
+    constructor(canvas, selectableElements) {
         this.canvas = canvas;
         this.setupCanvas();
         this.context2d = this.canvas.getContext("2d");
 
-        this.selectables = selectables;
+        this.selectables = selectableElements.map(
+            (selectableElement) => new Selectable(selectableElement)
+        );
         this.selected = new Array();
 
         this.selecting = false;
 
-        this.start = {
-            x: null,
-            y: null
-        }
-        this.end = {
-            x: null,
-            y: null
-        }
-
+        this.selection = {
+            canvasCoords: {
+                left: null,
+                top: null,
+                right: null,
+                bottom: null,
+            },
+            windowCoords: {
+                left: null,
+                top: null,
+                right: null,
+                bottom: null
+            }
+        };
         this.canvas.onmousedown = (event) => {
             this.clear();
 
             this.selecting = true;
-            this.start.x = event.layerX;
-            this.start.y = event.layerY;
+            this.selection.canvasCoords.left = event.layerX;
+            this.selection.canvasCoords.top = event.layerY;
         };
         this.canvas.onmousemove = (event) => {
             this.clear();
 
             if(this.selecting) {
-                this.end.x = event.layerX;
-                this.end.y = event.layerY;
+                this.selection.canvasCoords.right = event.layerX;
+                this.selection.canvasCoords.bottom = event.layerY;
                 this.drawRect()
             }
         };
@@ -236,7 +255,6 @@ class VisualSelection {
             element.onmouseup = (event) => {
                 if(this.selecting) {
                     this.selected = this.getElementsInsideSelection();
-                    console.log(this.selected);
 
                     this.clear();
                     this.selecting = false;
@@ -266,27 +284,42 @@ class VisualSelection {
         // perimeter
         this.context2d.globalAlpha = 1;
         this.context2d.beginPath(); 
-        this.context2d.moveTo(this.start.x , this.start.y);
-        this.context2d.lineTo(this.end.x , this.start.y);
-        this.context2d.lineTo(this.end.x, this.end.y);
-        this.context2d.lineTo(this.start.x, this.end.y);
-        this.context2d.lineTo(this.start.x, this.start.y);
+        this.context2d.moveTo(
+            this.selection.canvasCoords.left,
+            this.selection.canvasCoords.top
+        );
+        this.context2d.lineTo(
+            this.selection.canvasCoords.right,
+            this.selection.canvasCoords.top
+        );
+        this.context2d.lineTo(
+            this.selection.canvasCoords.right,
+            this.selection.canvasCoords.bottom
+        );
+        this.context2d.lineTo(
+            this.selection.canvasCoords.left,
+            this.selection.canvasCoords.bottom
+        );
+        this.context2d.lineTo(
+            this.selection.canvasCoords.left,
+            this.selection.canvasCoords.top
+        );
         this.context2d.stroke();
 
         // fill
         this.context2d.globalAlpha = 0.2;
         this.context2d.beginPath(); 
         this.context2d.rect(
-            this.start.x,
-            this.start.y, 
-            this.end.x - this.start.x,
-            this.end.y - this.start.y,
+            this.selection.canvasCoords.left,
+            this.selection.canvasCoords.top,
+            this.selection.canvasCoords.right - this.selection.canvasCoords.left,
+            this.selection.canvasCoords.bottom - this.selection.canvasCoords.top,
         )
         this.context2d.fill();
     }
 
     getElementsInsideSelection() {
-        this.selectables.filter;
+        return this.selectables;
     }
 }
 
