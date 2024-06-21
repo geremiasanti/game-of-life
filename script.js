@@ -216,7 +216,6 @@ class VisualSelection {
         this.selectables = selectableElements.map(
             (selectableElement) => new Selectable(selectableElement)
         );
-        this.selected = new Array();
 
         this.selecting = false;
 
@@ -236,8 +235,6 @@ class VisualSelection {
         };
         this.canvas.onmousedown = (event) => {
             this.clear();
-
-            console.log(event);
 
             this.selecting = true;
             this.selection.canvasCoords.left = event.layerX;
@@ -260,8 +257,10 @@ class VisualSelection {
         [this.canvas, window].forEach(element => {
             element.onmouseup = (event) => {
                 if(this.selecting) {
-                    this.selected = this.getElementsInsideSelection();
-                    console.log(this.selected);
+                    let selectedElements = this.getElementsInsideSelection();
+                    selectedElements.forEach((element) => {
+                        element.htmlElement.setAttribute("style", "background-color: red;");
+                    }) 
 
                     this.clear();
                     this.selecting = false;
@@ -326,8 +325,13 @@ class VisualSelection {
     }
 
     getElementsInsideSelection() {
-        console.log(this.selection);
-        return this.selectables;
+        return this.selectables.filter((selectable) => {
+            // inner or on border
+            return selectable.left > this.selection.windowCoords.left
+            && selectable.right < this.selection.windowCoords.right
+            && selectable.top > this.selection.windowCoords.top
+            && selectable.bottom < this.selection.windowCoords.bottom
+        });
     }
 }
 
