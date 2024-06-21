@@ -325,12 +325,29 @@ class VisualSelection {
     }
 
     getElementsInsideSelection() {
+        let left = Math.min(
+            this.selection.windowCoords.left,
+            this.selection.windowCoords.right
+        );
+        let right = Math.max(
+            this.selection.windowCoords.left,
+            this.selection.windowCoords.right
+        );
+        let top = Math.min(
+            this.selection.windowCoords.top,
+            this.selection.windowCoords.bottom
+        );
+        let bottom = Math.max(
+            this.selection.windowCoords.top,
+            this.selection.windowCoords.bottom
+        );
+
         return this.selectables.filter((selectable) => {
             // inner or on border
-            return selectable.left > this.selection.windowCoords.left
-            && selectable.right < this.selection.windowCoords.right
-            && selectable.top > this.selection.windowCoords.top
-            && selectable.bottom < this.selection.windowCoords.bottom
+            return selectable.left > left
+            && selectable.right < right
+            && selectable.top > top
+            && selectable.bottom < bottom
         });
     }
 }
