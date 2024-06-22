@@ -188,17 +188,14 @@ class Grid {
             }
         }
     }
-
-    getCellElements() {
-        return this.grid.flat().map((cell) => cell.htmlElement);
-    }
 }
 
 
 class Selectable {
-    constructor(htmlElement) {
-        this.htmlElement = htmlElement;
-        let boundingClientRect = htmlElement.getBoundingClientRect();
+    constructor(cell) {
+        this.cell = cell;
+
+        let boundingClientRect = this.cell.htmlElement.getBoundingClientRect();
         this.left = parseInt(boundingClientRect.left);
         this.top = parseInt(boundingClientRect.top);
         this.right = parseInt(boundingClientRect.right);
@@ -208,12 +205,12 @@ class Selectable {
 
 
 class VisualSelection {
-    constructor(canvas, selectableElements) {
+    constructor(canvas, selectables) {
         this.canvas = canvas;
         this.setupCanvas();
         this.context2d = this.canvas.getContext("2d");
 
-        this.selectables = selectableElements.map(
+        this.selectables = selectables.map(
             (selectableElement) => new Selectable(selectableElement)
         );
 
@@ -257,9 +254,9 @@ class VisualSelection {
         [this.canvas, window].forEach(element => {
             element.onmouseup = (event) => {
                 if(this.selecting) {
-                    let selectedElements = this.getElementsInsideSelection();
-                    selectedElements.forEach((element) => {
-                        element.htmlElement.setAttribute("style", "background-color: red;");
+                    let selected = this.getSelectablesInsideSelection();
+                    selected.forEach((selected) => {
+                        selected.cell.updateCell(true);
                     }) 
 
                     this.clear();
@@ -324,7 +321,7 @@ class VisualSelection {
         this.context2d.fill();
     }
 
-    getElementsInsideSelection() {
+    getSelectablesInsideSelection() {
         let left = Math.min(
             this.selection.windowCoords.left,
             this.selection.windowCoords.right
@@ -418,7 +415,7 @@ function main() {
     let grid = new Grid(document.getElementById("grid"));
     let visualSelection = new VisualSelection(
         document.getElementById("visual-selection-canvas"),
-        grid.getCellElements()
+        grid.grid.flat()
     );
 
     let generationTimespanMs = 250;
