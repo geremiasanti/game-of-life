@@ -12,7 +12,6 @@
 #grid > div {
     background-color: white;
     text-align: center;
-    border: 1px solid black;
 }
 
 #visual-selection-canvas {
@@ -25,4 +24,24 @@
 
 .display-none {
     display: none;
+}
+
+.border-black {
+    border: 1px solid black;
+}
+
+.selection-border-left {
+    border-left: 5px solid red;
+}
+
+.selection-border-right {
+    border-right: 5px solid red;
+}
+
+.selection-border-top {
+    border-top: 5px solid red;
+}
+
+.selection-border-bottom {
+    border-bottom: 5px solid red;
 }

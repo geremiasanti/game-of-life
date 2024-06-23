@@ -1,6 +1,8 @@
 class Cell {
     constructor() {
         this.htmlElement = document.createElement("div");;
+        this.htmlElement.classList.add("border-black");
+
         this.state = false;
         this.nextState = null;
 
@@ -255,9 +257,7 @@ class VisualSelection {
             element.onmouseup = (event) => {
                 if(this.selecting) {
                     let selected = this.getSelectablesInsideSelection();
-                    selected.forEach((selected) => {
-                        selected.cell.updateCell(true);
-                    }) 
+                    this.highlight(selected);
 
                     this.clear();
                     this.selecting = false;
@@ -270,11 +270,11 @@ class VisualSelection {
         // css properties just stretch the canvas,
         // need to set attributes for coorrect pixels coordinates
         this.canvas.setAttribute(
-            'width', 
+            "width", 
             window.getComputedStyle(this.canvas, null).getPropertyValue("width")
         );
         this.canvas.setAttribute(
-            'height', 
+            "height", 
             window.getComputedStyle(this.canvas, null).getPropertyValue("height")
         );
     }
@@ -346,6 +346,37 @@ class VisualSelection {
             && selectable.top > top
             && selectable.bottom < bottom
         });
+    }
+
+    highlight(selectables) {
+        let leftSide = Math.min(...selectables.map((selectable) => selectable.left)) 
+        let rightSide = Math.max(...selectables.map((selectable) => selectable.right)) 
+        let topSide = Math.min(...selectables.map((selectable) => selectable.top)) 
+        let bottomSide = Math.max(...selectables.map((selectable) => selectable.bottom)) 
+
+        selectables.filter(
+            (selectable) => selectable.left == leftSide
+        ).forEach(
+            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-left")
+        )
+
+        selectables.filter(
+            (selectable) => selectable.right == rightSide
+        ).forEach(
+            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-right")
+        )
+
+        selectables.filter(
+            (selectable) => selectable.top == topSide
+        ).forEach(
+            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-top")
+        )
+
+        selectables.filter(
+            (selectable) => selectable.bottom == bottomSide
+        ).forEach(
+            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-bottom")
+        )
     }
 }
 
