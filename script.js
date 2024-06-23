@@ -10,10 +10,6 @@ class Cell {
         this.liveNeighbors = 0;
 
         this.lastConfiguration = null;
-
-        this.htmlElement.onclick = () => {
-            this.updateCell(!this.state);
-        };
     }
 
     updateCell(newState) {
@@ -260,16 +256,28 @@ class VisualSelection {
 
         [this.canvas, window].forEach(element => {
             element.onmouseup = (event) => {
+                if(this.selecting) {
+                    if(this.dragging) {
+                        // area selection
+                        let selected = this.getSelectablesInsideSelection();
+                        this.highlight(selected);
 
-                if(this.selecting && this.dragging) {
-                    let selected = this.getSelectablesInsideSelection();
-                    this.highlight(selected);
+                        this.clear();
+                    } else {
+                        // single cell selection
+                        //TODO: add multiple selection with Ctrl key
+                        let selected = this.getClickedSelectable();
+                        this.highlight(selected);
 
-                    this.clear();
+
+                    }
+
                     this.selecting = false;
                     this.dragging = false;
                 }
             };
+
+            //TODO: add class .selected to filter for later use
         });
     }
 
@@ -355,35 +363,58 @@ class VisualSelection {
         });
     }
 
-    highlight(selectables) {
-        let leftSide = Math.min(...selectables.map((selectable) => selectable.left)) 
-        let rightSide = Math.max(...selectables.map((selectable) => selectable.right)) 
-        let topSide = Math.min(...selectables.map((selectable) => selectable.top)) 
-        let bottomSide = Math.max(...selectables.map((selectable) => selectable.bottom)) 
+    getClickedSelectable() {
+        return this.selectables.find(
+            selectable => 
+                selectable.left < this.selection.windowCoords.left 
+                && this.selection.windowCoords.left < selectable.right
+                && selectable.top < this.selection.windowCoords.top 
+                && this.selection.windowCoords.top < selectable.bottom
+        );
+    }
 
-        selectables.filter(
-            (selectable) => selectable.left == leftSide
-        ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-left")
-        )
+    highlight(selected) {
+        function highlightSingleCell(selectable) {
+            console.log(selectable);
+            selectable.cell.htmlElement.classList.add("selection-border-all-sides");
+        }
 
-        selectables.filter(
-            (selectable) => selectable.right == rightSide
-        ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-right")
-        )
+        function highlightArea(selectables) {
+            let leftSide = Math.min(...selectables.map((selectable) => selectable.left));
+            let rightSide = Math.max(...selectables.map((selectable) => selectable.right)); 
+            let topSide = Math.min(...selectables.map((selectable) => selectable.top));
+            let bottomSide = Math.max(...selectables.map((selectable) => selectable.bottom));
 
-        selectables.filter(
-            (selectable) => selectable.top == topSide
-        ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-top")
-        )
+            selectables.filter(
+                (selectable) => selectable.left == leftSide
+            ).forEach(
+                (selectable) => selectable.cell.htmlElement.classList.add("selection-border-left")
+            );
 
-        selectables.filter(
-            (selectable) => selectable.bottom == bottomSide
-        ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-bottom")
-        )
+            selectables.filter(
+                (selectable) => selectable.right == rightSide
+            ).forEach(
+                (selectable) => selectable.cell.htmlElement.classList.add("selection-border-right")
+            );
+
+            selectables.filter(
+                (selectable) => selectable.top == topSide
+            ).forEach(
+                (selectable) => selectable.cell.htmlElement.classList.add("selection-border-top")
+            );
+
+            selectables.filter(
+                (selectable) => selectable.bottom == bottomSide
+            ).forEach(
+                (selectable) => selectable.cell.htmlElement.classList.add("selection-border-bottom")
+            );
+        }
+
+        if(selected instanceof Array) {
+            highlightArea(selected)
+        } else {
+            highlightSingleCell(selected)
+        }
     }
 }
 

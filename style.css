@@ -30,6 +30,10 @@
     border: 1px solid black;
 }
 
+.selection-border-all-sides {
+    border: 5px solid red;
+}
+
 .selection-border-left {
     border-left: 5px solid red;
 }
