@@ -217,6 +217,7 @@ class VisualSelection {
         );
 
         this.selecting = false;
+        this.dragging = false;
 
         this.selection = {
             canvasCoords: {
@@ -232,6 +233,7 @@ class VisualSelection {
                 bottom: null
             }
         };
+
         this.canvas.onmousedown = (event) => {
             this.clear();
 
@@ -241,10 +243,13 @@ class VisualSelection {
             this.selection.windowCoords.left = event.clientX;
             this.selection.windowCoords.top = event.clientY;
         };
+
         this.canvas.onmousemove = (event) => {
             this.clear();
 
             if(this.selecting) {
+                this.dragging = true
+
                 this.selection.canvasCoords.right = event.layerX;
                 this.selection.canvasCoords.bottom = event.layerY;
                 this.selection.windowCoords.right = event.clientX;
@@ -255,12 +260,14 @@ class VisualSelection {
 
         [this.canvas, window].forEach(element => {
             element.onmouseup = (event) => {
-                if(this.selecting) {
+
+                if(this.selecting && this.dragging) {
                     let selected = this.getSelectablesInsideSelection();
                     this.highlight(selected);
 
                     this.clear();
                     this.selecting = false;
+                    this.dragging = false;
                 }
             };
         });
