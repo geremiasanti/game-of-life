@@ -94,6 +94,8 @@ class Grid {
         this.generation = 0; 
 
         this.drawGrid();
+
+        this.setupCommandsHandlers()
     }
 
     // fills the grid element with divs (cells)
@@ -185,6 +187,23 @@ class Grid {
                 );
             }
         }
+    }
+
+    setupCommandsHandlers() {
+        let ctrlDown = false,
+            ctrlKey = 17,
+            cmdKey = 91,
+            vKey = 86,
+            cKey = 67;
+
+        document.onkeydown = (e) => {
+            if(e.keyCode == ctrlKey || e.keyCode == cmdKey)
+                ctrlDown = true;
+        };
+        document.onkeyup = (e) => {
+            if(e.keyCode == ctrlKey || e.keyCode == cmdKey)
+                ctrlDown = false;
+        };
     }
 }
 
