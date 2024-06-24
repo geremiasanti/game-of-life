@@ -389,7 +389,7 @@ class VisualSelection {
                     // bottom border
                     || selectable.top < bottom && bottom < selectable.bottom 
                 )
-            )
+            );
         });
     }
 
