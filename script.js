@@ -188,7 +188,6 @@ class Grid {
     }
 }
 
-
 class Selectable {
     constructor(cell) {
         this.cell = cell;
@@ -200,7 +199,6 @@ class Selectable {
         this.bottom = parseInt(boundingClientRect.bottom);
     }
 }
-
 
 class VisualSelection {
     constructor(canvas, selectables) {
@@ -477,8 +475,6 @@ function loadSavedGridsList(grid) {
         }
     );
 };
-
-
 
 function main() {
     let grid = new Grid(document.getElementById("grid"));
