@@ -293,7 +293,8 @@ class VisualSelection {
                     } else {
                         // single cell click
                         let clicked = this.getClickedSelectable();
-                        clicked.cell.updateCell(!clicked.cell.state)
+                        if(typeof clicked != 'undefined') 
+                            clicked.cell.updateCell(!clicked.cell.state)
                     }
 
                     this.selecting = false;
