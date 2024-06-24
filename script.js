@@ -260,7 +260,6 @@ class VisualSelection {
                         // area selection
                         this.clearPreviousSelection();
                         let selected = this.getSelectablesInsideSelection();
-                        console.log(selected);
                         selected.forEach(
                             selectable => selectable.cell.htmlElement.classList.add("selected")
                         );
