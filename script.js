@@ -389,6 +389,16 @@ class VisualSelection {
                     // bottom border
                     || selectable.top < bottom && bottom < selectable.bottom 
                 )
+            ) || (
+                // corners
+                (
+                    selectable.left < left && left < selectable.right 
+                    || selectable.left < right && right < selectable.right 
+                ) && (
+                    selectable.top < top && top < selectable.bottom 
+                    || selectable.top < bottom && bottom < selectable.bottom 
+                )
+
             );
         });
     }
