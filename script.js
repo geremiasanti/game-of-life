@@ -20,9 +20,9 @@ class Cell {
         this.updateCellStyle();
 
         let neighborsIncrement = newState ? 1 : -1;
-        this.neighbors.forEach((neighbor) => {
-            neighbor.incrementLiveNeighbors(neighborsIncrement);
-        });
+        this.neighbors.forEach(
+            neighbor => neighbor.incrementLiveNeighbors(neighborsIncrement)
+        );
     }
 
     updateCellStyle() {
@@ -262,6 +262,9 @@ class VisualSelection {
                         // area selection
                         this.clearPreviousSelection();
                         let selected = this.getSelectablesInsideSelection();
+                        selected.forEach(
+                            selectable => selectable.cell.htmlElement.classList.add("selected")
+                        );
                         this.highlight(selected);
                     } else {
                         // single cell click
@@ -273,8 +276,6 @@ class VisualSelection {
                     this.dragging = false;
                 }
             };
-
-            //TODO: add class .selected to filter for later use
         });
     }
 
@@ -386,37 +387,33 @@ class VisualSelection {
     }
 
     highlight(selectables) {
-        selectables.forEach(
-            selectable => selectable.cell.htmlElement.classList.add("selected")
-        );
-
         let leftSide = Math.min(...selectables.map((selectable) => selectable.left));
         let rightSide = Math.max(...selectables.map((selectable) => selectable.right)); 
         let topSide = Math.min(...selectables.map((selectable) => selectable.top));
         let bottomSide = Math.max(...selectables.map((selectable) => selectable.bottom));
 
         selectables.filter(
-            (selectable) => selectable.left == leftSide
+            selectable => selectable.left == leftSide
         ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-left")
+            selectable => selectable.cell.htmlElement.classList.add("selection-border-left")
         );
 
         selectables.filter(
-            (selectable) => selectable.right == rightSide
+            selectable => selectable.right == rightSide
         ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-right")
+            selectable => selectable.cell.htmlElement.classList.add("selection-border-right")
         );
 
         selectables.filter(
-            (selectable) => selectable.top == topSide
+            selectable => selectable.top == topSide
         ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-top")
+            selectable => selectable.cell.htmlElement.classList.add("selection-border-top")
         );
 
         selectables.filter(
-            (selectable) => selectable.bottom == bottomSide
+            selectable => selectable.bottom == bottomSide
         ).forEach(
-            (selectable) => selectable.cell.htmlElement.classList.add("selection-border-bottom")
+            selectable => selectable.cell.htmlElement.classList.add("selection-border-bottom")
         );
     }
 }
@@ -451,7 +448,7 @@ function loadSavedGridsList(grid) {
     function deleteSavedGrid(grid, savedGridIndex) {
         let gridsStorage = JSON.parse(localStorage.getItem("grids"));
         let gridsStorageFiltered = gridsStorage.filter(
-            (savedGrid) => savedGrid.index != savedGridIndex
+            savedGrid => savedGrid.index != savedGridIndex
         );
         localStorage.setItem("grids", JSON.stringify(gridsStorageFiltered));
         loadSavedGridsList(grid);
