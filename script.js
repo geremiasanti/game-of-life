@@ -384,7 +384,9 @@ class VisualSelection {
                     || selectable.left < right && right < selectable.right 
                 ) 
                 || horizontallyInside && (
+                    // top border
                     selectable.top < top && top < selectable.bottom 
+                    // bottom border
                     || selectable.top < bottom && bottom < selectable.bottom 
                 )
             )
