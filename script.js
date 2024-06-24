@@ -260,6 +260,7 @@ class VisualSelection {
                         // area selection
                         this.clearPreviousSelection();
                         let selected = this.getSelectablesInsideSelection();
+                        console.log(selected);
                         selected.forEach(
                             selectable => selectable.cell.htmlElement.classList.add("selected")
                         );
@@ -366,11 +367,27 @@ class VisualSelection {
         );
 
         return this.selectables.filter((selectable) => {
-            // inner or on border
-            return selectable.left > left
-            && selectable.right < right
-            && selectable.top > top
-            && selectable.bottom < bottom
+            let horizontallyInside = 
+                selectable.left > left && selectable.right < right
+            let verticallyInside = 
+                selectable.top > top && selectable.bottom < bottom
+
+            return (
+                // whole cell inside selection
+                horizontallyInside && verticallyInside
+            ) || (
+                // on the selection border (part of the cell inside selection)
+                verticallyInside && (
+                    // left border
+                    selectable.left < left && left < selectable.right 
+                    // right border
+                    || selectable.left < right && right < selectable.right 
+                ) 
+                || horizontallyInside && (
+                    selectable.top < top && top < selectable.bottom 
+                    || selectable.top < bottom && bottom < selectable.bottom 
+                )
+            )
         });
     }
 
