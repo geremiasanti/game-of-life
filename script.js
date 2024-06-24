@@ -190,17 +190,24 @@ class Grid {
     }
 
     setupCommandsHandlers() {
-        let ctrlDown = false,
-            ctrlKey = 17,
-            cmdKey = 91,
-            vKey = 86,
-            cKey = 67;
+        const ctrlKey = 17, cmdKey = 91, vKey = 86, cKey = 67;
+        let ctrlDown = false;
 
         document.onkeydown = (e) => {
+            // Ctrl
             if(e.keyCode == ctrlKey || e.keyCode == cmdKey)
                 ctrlDown = true;
+
+            // Ctrl-C
+            if(ctrlDown && e.keyCode == cKey)
+                console.log('copying');
+
+            // Ctrl-V
+            if(ctrlDown && e.keyCode == vKey)
+                console.log('pasting');
         };
         document.onkeyup = (e) => {
+            // Ctrl
             if(e.keyCode == ctrlKey || e.keyCode == cmdKey)
                 ctrlDown = false;
         };
