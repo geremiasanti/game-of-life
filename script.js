@@ -1,6 +1,7 @@
 class Cell {
     constructor() {
         this.htmlElement = document.createElement("div");;
+        this.boundingClientRect = null;
         this.htmlElement.classList.add("border-black");
 
         this.state = false;
@@ -40,6 +41,10 @@ class Cell {
     nextGeneration() {
         this.updateCell(this.nextState)
         this.nextState = null;
+    }
+
+    updateBoundingClientRect() {
+        this.boundingClientRect = this.htmlElement.getBoundingClientRect();
     }
 }
 
@@ -87,6 +92,18 @@ class Grid {
             } 
         }
 
+        this.hoveredCell = null;
+        this.htmlElement.addEventListener("mousemove", (event) => {
+            // don't check other cells if cursor still in the same one
+            if(this.hoveredCell != null && coordsInsideBounds(this.hoveredCell.boundingClientRect, event.clientX, event.clientY)) 
+                return;
+
+            this.hoveredCell = this.grid.flat().find(
+                (cell) => coordsInsideBounds(cell.boundingClientRect, event.clientX, event.clientY)
+            ) || this.hoveredCell;
+            console.log(this.hoveredCell);
+        })
+
         // grid style (to fit cols and rows)
         this.htmlElement.style.gridTemplateRows = `repeat(${this.rows}, ${cellSizePx}px)`;
         this.htmlElement.style.gridTemplateColumns = `repeat(${this.cols}, ${cellSizePx}px)`;
@@ -104,6 +121,7 @@ class Grid {
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
                 this.htmlElement.appendChild(this.grid[row][col].htmlElement);  
+                this.grid[row][col].updateBoundingClientRect();
             } 
         } 
     }
@@ -564,6 +582,13 @@ function loadSavedGridsList(grid) {
         }
     );
 };
+
+function coordsInsideBounds(bounds, x, y) {
+    return bounds.left < x
+        && x < bounds.right
+        && bounds.top < y 
+        && y < bounds.bottom
+}
 
 function main() {
     let grid = new Grid(document.getElementById("grid"));
