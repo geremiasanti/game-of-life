@@ -9,7 +9,7 @@ class Cell {
         this.neighbors = new Array();
         this.liveNeighbors = 0;
 
-        this.lastConfiguration = null;
+        this.selected = false;
     }
 
     updateCell(newState) {
@@ -200,17 +200,28 @@ class Grid {
 
             // Ctrl-C
             if(ctrlDown && e.keyCode == cKey)
-                console.log('copying');
+                this.copy();
 
             // Ctrl-V
             if(ctrlDown && e.keyCode == vKey)
-                console.log('pasting');
+                this.paste();
         };
         document.onkeyup = (e) => {
             // Ctrl
             if(e.keyCode == ctrlKey || e.keyCode == cmdKey)
                 ctrlDown = false;
         };
+    }
+
+    copy() {
+        for(let row = 0; row < this.rows; row++) {
+            for(let col = 0; col < this.cols; col++) {
+            }
+        }
+    }
+
+    paste() {
+        console.log('pasting');
     }
 }
 
@@ -286,9 +297,9 @@ class VisualSelection {
                         // area selection
                         this.clearPreviousSelection();
                         let selected = this.getSelectablesInsideSelection();
-                        selected.forEach(
-                            selectable => selectable.cell.htmlElement.classList.add("selected")
-                        );
+                        selected.forEach(selectable => {
+                            selectable.cell.selected = true;
+                        });
                         this.highlight(selected);
                     } else {
                         // single cell click
@@ -323,17 +334,17 @@ class VisualSelection {
 
     clearPreviousSelection() {
         let classesToRemove = [
-            "selected", 
             "selection-border-left",
             "selection-border-right",
             "selection-border-top",
             "selection-border-bottom",
         ];
         this.selectables.filter(
-            selectable => selectable.cell.htmlElement.classList.contains("selected")
-        ).forEach(
-            selectable => selectable.cell.htmlElement.classList.remove(...classesToRemove)
-        );
+            selectable => selectable.cell.selected
+        ).forEach(selectable => {
+            selectable.cell.htmlElement.classList.remove(...classesToRemove);
+            selectable.cell.selected = false;
+        });
     }
 
     drawRect() {
