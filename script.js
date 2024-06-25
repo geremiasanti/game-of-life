@@ -96,6 +96,7 @@ class Grid {
         this.drawGrid();
 
         this.setupCommandsHandlers()
+        this.copied = null;
     }
 
     // fills the grid element with divs (cells)
@@ -214,10 +215,32 @@ class Grid {
     }
 
     copy() {
+        let selection = {
+            start: {
+                row: null,
+                col: null
+            },
+            end: {
+                row: null,
+                col: null
+            }
+        };
         for(let row = 0; row < this.rows; row++) {
             for(let col = 0; col < this.cols; col++) {
+                if(this.grid[row][col].selected) {
+                    if(selection.start.row == null && selection.start.col == null) {
+                        selection.start.row = row; 
+                        selection.start.col = col; 
+                    }
+                    selection.end.row = row; 
+                    selection.end.col = col; 
+                } 
             }
         }
+
+        this.copied = this.grid.slice(selection.start.row, selection.end.row + 1).map(
+            row => row.slice(selection.start.col, selection.end.col + 1)
+        );
     }
 
     paste() {
