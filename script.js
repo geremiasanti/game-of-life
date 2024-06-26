@@ -288,6 +288,21 @@ class Grid {
             }
         }
     }
+
+    clearPreviousSelection() {
+        let classesToRemove = [
+            "selection-border-left",
+            "selection-border-right",
+            "selection-border-top",
+            "selection-border-bottom",
+        ];
+        this.grid.flat().filter(
+            cell => cell.selected
+        ).forEach(cell => {
+            cell.htmlElement.classList.remove(...classesToRemove);
+            cell.selected = false;
+        });
+    }
 }
 
 class Selectable {
