@@ -52,6 +52,7 @@ class Cell {
 }
 
 class Grid {
+    //TODO: add paste preview
     constructor(htmlElement) {
         this.htmlElement = htmlElement; 
 
@@ -217,20 +218,28 @@ class Grid {
 
         document.onkeydown = (e) => {
             // Ctrl
-            if(e.keyCode == ctrlKey || e.keyCode == cmdKey)
+            if(e.keyCode == ctrlKey || e.keyCode == cmdKey) {
                 ctrlDown = true;
+                return;
+            }
 
             // Ctrl-C
-            if(ctrlDown && e.keyCode == cKey)
+            if(ctrlDown && e.keyCode == cKey) {
                 this.copy();
+                return;
+            }
 
             // Ctrl-V
-            if(ctrlDown && e.keyCode == vKey)
+            if(ctrlDown && e.keyCode == vKey) {
                 this.paste();
+                return;
+            }
 
             // Escape
-            if(e.key == "Escape")
+            if(e.key == "Escape") {
                 this.clearPreviousSelection();
+                return;
+            }
         };
         document.onkeyup = (e) => {
             // Ctrl
