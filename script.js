@@ -1,5 +1,8 @@
 class Cell {
-    constructor() {
+    constructor(row, col) {
+        this.row = row;
+        this.col = col;
+
         this.htmlElement = document.createElement("div");;
         this.boundingClientRect = null;
         this.htmlElement.classList.add("border-black");
@@ -61,8 +64,8 @@ class Grid {
 
         // init grid
         this.grid = new Array(this.rows).fill().map(
-            (_) => new Array(this.cols).fill().map(
-                (_) => new Cell()
+            (_, rowIndex) => new Array(this.cols).fill().map(
+                (_, colIndex) => new Cell(rowIndex, colIndex)
             )
         );
 
@@ -92,6 +95,7 @@ class Grid {
             } 
         }
 
+        // keep track of hovered cell
         this.hoveredCell = null;
         this.htmlElement.addEventListener("mousemove", (event) => {
             // don't check other cells if cursor still in the same one
@@ -101,7 +105,6 @@ class Grid {
             this.hoveredCell = this.grid.flat().find(
                 (cell) => coordsInsideBounds(cell.boundingClientRect, event.clientX, event.clientY)
             ) || this.hoveredCell;
-            console.log(this.hoveredCell);
         })
 
         // grid style (to fit cols and rows)
@@ -112,8 +115,8 @@ class Grid {
 
         this.drawGrid();
 
-        this.setupCommandsHandlers()
         this.copied = null;
+        this.setupCommandsHandlers()
     }
 
     // fills the grid element with divs (cells)
@@ -224,6 +227,10 @@ class Grid {
             // Ctrl-V
             if(ctrlDown && e.keyCode == vKey)
                 this.paste();
+
+            // Escape
+            if(e.key == "Escape")
+                this.clearPreviousSelection();
         };
         document.onkeyup = (e) => {
             // Ctrl
@@ -257,12 +264,20 @@ class Grid {
         }
 
         this.copied = this.grid.slice(selection.start.row, selection.end.row + 1).map(
-            row => row.slice(selection.start.col, selection.end.col + 1)
+            row => row.slice(selection.start.col, selection.end.col + 1).map(
+                cell => cell.state
+            )
         );
     }
 
     paste() {
-        console.log('pasting');
+        for(let row = 0; row < this.copied.length; row++) {
+            for(let col = 0; col < this.copied[0].length; col++) {
+                let copyToRow = (this.hoveredCell.row + row) % this.rows;
+                let copyToCol = (this.hoveredCell.col + col) % this.cols;
+                this.grid[copyToRow][copyToCol].updateCell(this.copied[row][col]);
+            }
+        }
     }
 }
 
@@ -279,6 +294,7 @@ class Selectable {
 }
 
 class VisualSelection {
+    //TODO: fix scroll offset selection and click
     constructor(canvas, selectables) {
         this.canvas = canvas;
         this.setupCanvas();
@@ -354,6 +370,11 @@ class VisualSelection {
                 }
             };
         });
+
+        /*
+        document.onkeydown = (e) => {
+        };
+        */
     }
 
     setupCanvas() {
